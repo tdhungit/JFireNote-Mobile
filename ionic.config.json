@@ -1,0 +1,7 @@
+{
+  "name": "JFireNotes-Mobile",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
