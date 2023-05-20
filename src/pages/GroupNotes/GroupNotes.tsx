@@ -14,6 +14,7 @@ import {
 } from '@ionic/react';
 import { addCircle, options, trash } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
+import Linkify from 'react-linkify';
 import { RouteComponentProps } from 'react-router';
 import AddGroup from '../../components/AddGroup/AddGroup';
 import AddNote from '../../components/AddNote/AddNote';
@@ -32,6 +33,7 @@ function GroupNotes({ match }: Props) {
 
   const [notes, setNotes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const [title, setTitle] = useState('');
   const [group, setGroup] = useState<any>({});
@@ -47,9 +49,16 @@ function GroupNotes({ match }: Props) {
     const groupData: any = await getGroup(db, groupId);
     setTitle(groupData.name);
     setGroup(groupData);
-    getNotes(db, match.params.id, (notes: any) => {
-      setNotes(notes);
-      setLoading(false);
+    getNotes(db, match.params.id, (notes: any, error: any) => {
+      if (error) {
+        console.log(error);
+        setErrorMessage(error.message);
+        setLoading(false);
+      } else if (notes) {
+        setNotes(notes);
+        setLoading(false);
+        setErrorMessage('');
+      }
     });
   };
 
@@ -105,6 +114,11 @@ function GroupNotes({ match }: Props) {
         {loading && (
           <div style={{ padding: 10, textAlign: 'center' }}>
             <IonSpinner />
+          </div>
+        )}
+        {errorMessage && (
+          <div style={{ padding: 10 }}>
+            <Linkify>{errorMessage}</Linkify>
           </div>
         )}
         <IonList inset={true}>
