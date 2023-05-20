@@ -12,10 +12,12 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { add } from 'ionicons/icons';
+import { addCircle, options, trash } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
+import AddGroup from '../../components/AddGroup/AddGroup';
 import AddNote from '../../components/AddNote/AddNote';
+import DeleteGroup from '../../components/DeleteGroup/DeleteGroup';
 import NoteDetail from '../../components/NoteDetail/NoteDetail';
 import { getDatabase } from '../../config/firebase';
 import { getGroup, getNotes } from '../../utils/notes';
@@ -32,16 +34,19 @@ function GroupNotes({ match }: Props) {
   const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState('');
+  const [group, setGroup] = useState<any>({});
+  const [isEditGroup, setIsEditGroup] = useState(false);
+  const [isDeleteGroup, setIsDeleteGroup] = useState(false);
+  const [isAddNote, setIsAddNote] = useState(false);
 
   const [activeNote, setActiveNote] = useState<any>(null);
   const [isOpenNote, setIsOpenNote] = useState(false);
 
-  const [isAddNote, setIsAddNote] = useState(false);
-
   const getNotesGroup = async (groupId: string) => {
     setLoading(true);
-    const group: any = await getGroup(db, groupId);
-    setTitle(group.name);
+    const groupData: any = await getGroup(db, groupId);
+    setTitle(groupData.name);
+    setGroup(groupData);
     getNotes(db, match.params.id, (notes: any) => {
       setNotes(notes);
       setLoading(false);
@@ -63,28 +68,39 @@ function GroupNotes({ match }: Props) {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot='start'>
+            {group.id && (
+              <IonButton onClick={() => setIsDeleteGroup(true)}>
+                <IonIcon icon={trash} />
+              </IonButton>
+            )}
+          </IonButtons>
           <IonTitle>{title}</IonTitle>
           <IonButtons slot='end'>
+            {group.name && (
+              <IonButton onClick={() => setIsEditGroup(true)}>
+                <IonIcon icon={options}></IonIcon>
+              </IonButton>
+            )}
             <IonButton onClick={() => setIsAddNote(true)}>
-              <IonIcon icon={add}></IonIcon>
+              <IonIcon icon={addCircle}></IonIcon>
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        <AddNote
+        <AddGroup
           db={db}
-          groupId={match.params.id}
-          open={isAddNote}
-          onOpenChange={setIsAddNote}
+          open={isEditGroup}
+          onOpenChange={setIsEditGroup}
+          id={match.params.id}
+          name={group.name}
+          onFinish={(values: any) => setTitle(values.name)}
         />
+        <DeleteGroup open={isDeleteGroup} onOpenChange={setIsDeleteGroup} db={db} group={group} />
+        <AddNote db={db} groupId={match.params.id} open={isAddNote} onOpenChange={setIsAddNote} />
         {activeNote && (
-          <NoteDetail
-            db={db}
-            open={isOpenNote}
-            onOpenChange={setIsOpenNote}
-            note={activeNote}
-          />
+          <NoteDetail db={db} open={isOpenNote} onOpenChange={setIsOpenNote} note={activeNote} />
         )}
         {loading && (
           <div style={{ padding: 10, textAlign: 'center' }}>

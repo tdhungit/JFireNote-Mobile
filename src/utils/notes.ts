@@ -28,12 +28,7 @@ export async function addGroupNote(db: Firestore, name: string) {
   });
 }
 
-export async function updateGroup(
-  db: Firestore,
-  id: string,
-  name?: string,
-  count?: number
-) {
+export async function updateGroup(db: Firestore, id: string, name?: string, count?: number) {
   const ref = doc(db, DbCollections.category, id);
   let data: any = {};
   if (name) {
@@ -43,16 +38,13 @@ export async function updateGroup(
   if (count && count > 0) {
     data.count = count;
   }
+
   const result: any = await updateDoc(ref, data);
   return { id: id, ...result };
 }
 
 export function getGroups(db: Firestore, callback: (data: any) => void) {
-  const q = query(
-    collection(db, DbCollections.category),
-    orderBy('createdAt'),
-    limit(100)
-  );
+  const q = query(collection(db, DbCollections.category), orderBy('createdAt'), limit(100));
 
   return onSnapshot(q, (QuerySnapshot) => {
     let groups: any = [];

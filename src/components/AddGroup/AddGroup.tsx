@@ -14,8 +14,8 @@ import {
 } from '@ionic/react';
 import { Firestore } from 'firebase/firestore';
 import { close, save } from 'ionicons/icons';
-import { useState } from 'react';
-import { addGroupNote } from '../../utils/notes';
+import { useEffect, useState } from 'react';
+import { addGroupNote, updateGroup } from '../../utils/notes';
 
 interface Props {
   db: Firestore;
@@ -23,25 +23,35 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   id?: string;
   name?: string;
+  onFinish?: (values: any) => void;
 }
 
-function AddGroup({ db, open, onOpenChange, id }: Props) {
+function AddGroup({ db, open, onOpenChange, id, name, onFinish }: Props) {
   const [title, setTitle] = useState('Add Group');
-  const [name, setName] = useState('');
+  const [newName, setNewName] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (id && name) {
+      setNewName(name);
+      setTitle('Edit Group');
+    }
+  }, [id, name]);
+
   const onSave = async () => {
-    if (!name) {
+    if (!newName) {
       return;
     }
 
     setLoading(true);
     if (id) {
+      await updateGroup(db, id, newName);
     } else {
-      await addGroupNote(db, name);
+      await addGroupNote(db, newName);
     }
     setLoading(false);
     onOpenChange(false);
+    onFinish && onFinish({ name: newName });
   };
 
   return (
@@ -70,8 +80,8 @@ function AddGroup({ db, open, onOpenChange, id }: Props) {
               labelPlacement='stacked'
               clearInput={true}
               placeholder='Enter group name'
-              value={name}
-              onIonChange={(e) => setName(e.target.value?.toString() || '')}
+              value={newName}
+              onIonChange={(e) => setNewName(e.target.value?.toString() || '')}
             ></IonInput>
           </IonItem>
         </IonList>
