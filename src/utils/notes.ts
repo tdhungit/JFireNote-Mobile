@@ -63,7 +63,8 @@ export async function getGroup(db: Firestore, groupId: string) {
 
 export async function addNote(db: Firestore, name: string, groupId: string) {
   const group: any = await getGroup(db, groupId);
-  await updateGroup(db, groupId, undefined, group.count + 1);
+  const count = group.count || 0;
+  await updateGroup(db, groupId, undefined, count + 1);
   return await addDoc(collection(db, DbCollections.note), {
     createdAt: serverTimestamp(),
     name,
