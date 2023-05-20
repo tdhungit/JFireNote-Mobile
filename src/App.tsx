@@ -9,7 +9,7 @@ import {
   setupIonicReact,
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { cog, home } from 'ionicons/icons';
+import { cog, help, home } from 'ionicons/icons';
 import { Redirect, Route } from 'react-router-dom';
 
 /* Core CSS required for Ionic components to work properly */
@@ -30,6 +30,7 @@ import '@ionic/react/css/text-transformation.css';
 
 /* Theme variables */
 import GroupNotes from './pages/GroupNotes/GroupNotes';
+import Help from './pages/Help/Help';
 import Home from './pages/Home/Home';
 import Setting from './pages/Setting/Setting';
 import './theme/variables.css';
@@ -43,6 +44,7 @@ const App: React.FC = () => (
         <IonRouterOutlet>
           <Route exact path='/home' component={Home} />
           <Route exact path='/setting' component={Setting} />
+          <Route exact path='/help' component={Help} />
           <Route exact path='/group/:id' component={GroupNotes} />
           <Route exact path='/'>
             <Redirect to='/home' />
@@ -52,6 +54,10 @@ const App: React.FC = () => (
           <IonTabButton tab='home' href='/home'>
             <IonIcon aria-hidden='true' icon={home} />
             <IonLabel>Home</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab='help' href='/help'>
+            <IonIcon aria-hidden='true' icon={help} />
+            <IonLabel>Help</IonLabel>
           </IonTabButton>
           <IonTabButton tab='setting' href='/setting'>
             <IonIcon aria-hidden='true' icon={cog} />
