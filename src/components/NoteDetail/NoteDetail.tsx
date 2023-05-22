@@ -12,7 +12,7 @@ import {
 } from '@ionic/react';
 import { Firestore } from 'firebase/firestore';
 import { trash } from 'ionicons/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { deleteNote, saveNote } from '../../utils/notes';
@@ -34,11 +34,15 @@ function NoteDetail({ db, open, onOpenChange, note }: Props) {
     setText(note.content);
   }, [note]);
 
+  const updateText = (value: string) => {
+    setText(value);
+  };
+
   const saveText = async (text: string) => {
     await saveNote(db, note.id, undefined, text);
   };
 
-  useMemo(() => {
+  useEffect(() => {
     saveText(text);
   }, [text]);
 
@@ -99,7 +103,7 @@ function NoteDetail({ db, open, onOpenChange, note }: Props) {
         <ReactQuill
           theme='snow'
           value={text}
-          onChange={setText}
+          onChange={updateText}
           style={{ height: '90%' }}
           modules={textOptions}
         />
